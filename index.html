@@ -5,110 +5,244 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>🌸 Moji Muncher — Word & Character Counter</title>
   <meta name="theme-color" content="#ffe6f0" />
+  <meta name="color-scheme" content="light dark" />
   <style>
     :root{
+      --bg1:#ffe6f0; --bg2:#e6f0ff; --bg3:#fff8fb;
+      --glass: rgba(255,255,255,.65);
+      --border: rgba(255,128,170,.35);
+      --text:#5d2644; --muted:#8b4e6e;
       --pink:#ff80aa; --pink-200:#ffb3d9; --pink-50:#fff0f5;
-      --bg1:#ffe6f0; --bg2:#e6f0ff; --text:#cc6699;
+      --chip:#fce7f2; --chipBorder:#ffd1e6;
+      --btnGrad1:#ff8bb4; --btnGrad2:#ff72a2;
+      --shadow: 0 10px 36px rgba(204,102,153,.16);
+      --ring: 255 128 170;
     }
-    *{box-sizing:border-box}
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg1:#1d1220; --bg2:#1b2231; --bg3:#24192a;
+        --glass: rgba(40,30,52,.6);
+        --border: rgba(255,128,170,.22);
+        --text:#fdf0f6; --muted:#d9bcd0;
+        --pink:#ffa1c4; --pink-200:#ffb9d3; --pink-50:#3a2337;
+        --chip:#3a2942; --chipBorder:#5a3c66;
+        --btnGrad1:#ff8bb4; --btnGrad2:#e46aa0;
+        --shadow: 0 12px 44px rgba(0,0,0,.4);
+      }
+    }
+
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
     body{
-      font-family:'Comic Sans MS','Arial',sans-serif;
-      max-width:700px; margin:40px auto; padding:24px;
-      background:linear-gradient(135deg,var(--bg1),var(--bg2));
-      border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,.1);
+      margin:0; color:var(--text);
+      font-family: ui-rounded, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, var(--bg2) 0%, transparent 60%),
+        radial-gradient(900px 600px at 110% 0%, var(--bg1) 0%, transparent 60%),
+        radial-gradient(1000px 800px at 50% 120%, var(--bg2) 0%, transparent 60%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      background-attachment: fixed;
+      display:grid; place-items:center; padding:32px 18px;
     }
-    h1{
-      text-align:center; color:var(--pink); font-size:2rem;
-      text-shadow:1px 1px #fff0f5; margin:0 0 12px;
+
+    .card{
+      width:min(860px, 100%);
+      background: linear-gradient(180deg, var(--glass), rgba(255,255,255,.55));
+      border:1px solid var(--border);
+      border-radius:18px; box-shadow:var(--shadow);
+      backdrop-filter: blur(10px) saturate(115%);
+      -webkit-backdrop-filter: blur(10px) saturate(115%);
+      overflow:hidden;
     }
-    .sub{ text-align:center; color:#a2557f; margin-bottom:16px; }
+    .header{
+      padding:20px 22px 12px; display:flex; align-items:center; gap:12px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.25), transparent 70%),
+        radial-gradient(800px 120px at 50% 0%, var(--pink-50) 0%, transparent 60%);
+      border-bottom:1px solid var(--border);
+    }
+    .brand{ display:flex; align-items:center; gap:12px }
+    .logo{
+      width:42px; height:42px; display:grid; place-items:center; border-radius:12px;
+      background: conic-gradient(from 200deg, var(--btnGrad1), var(--btnGrad2));
+      color:white; font-size:22px; font-weight:bold;
+      box-shadow: 0 6px 16px rgba(255,114,162,.35);
+    }
+    h1{ margin:0; font-size:1.35rem; letter-spacing:.2px }
+    .sub{ margin:2px 0 0; font-size:.92rem; color:var(--muted) }
+
+    .editor{ padding:16px 18px 6px }
+    .textareaWrap{
+      position:relative; border:1px solid var(--pink-200);
+      border-radius:14px; background:var(--bg3);
+      transition: box-shadow .2s ease, border-color .2s ease;
+    }
+    .textareaWrap:focus-within{
+      border-color:var(--pink);
+      box-shadow: 0 0 0 4px rgba(var(--ring)/.18);
+    }
     textarea{
-      width:100%; height:220px; padding:12px; font-size:16px; line-height:1.5;
-      border:2px solid var(--pink-200); border-radius:12px; background:#fffafc; resize:none; outline:none;
+      width:100%; min-height:220px; max-height:60vh; resize:none;
+      padding:14px 16px 52px; border:0; outline:none; background:transparent;
+      color:var(--text); font-size:17px; font-weight:500; line-height:1.6;
+      caret-color:var(--pink);
     }
-    textarea:focus{ border-color:var(--pink); box-shadow:0 0 8px var(--pink-200); }
+    .placeholder{
+      position:absolute; inset:auto 12px 12px 12px; font-size:.95rem; font-weight:500; color:var(--muted);
+    }
+
     .bar{
-      margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+      display:flex; flex-wrap:wrap; align-items:center; gap:12px; justify-content:space-between;
+      padding:10px 12px 16px;
     }
     .counter{
-      flex:1; min-width:220px; padding:10px; background:var(--pink-50); border:1px solid var(--pink-200);
-      border-radius:10px; display:flex; justify-content:space-around; font-weight:bold; color:var(--text);
+      flex:1 1 320px; min-width:280px;
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+      background:var(--pink-50);
+      border:1px solid var(--pink-200); border-radius:12px; padding:10px 12px;
     }
-    .btns{ display:flex; gap:8px; }
+    .stat{
+      display:flex; align-items:center; gap:8px; padding:8px 10px;
+      background:rgba(255,255,255,.55); border:1px solid var(--chipBorder); border-radius:10px;
+      font-size:1rem; font-weight:600;
+    }
+    .stat b{ font-weight:800 }
+    .btns{ display:flex; gap:10px; flex-wrap:wrap }
     button{
-      border:none; padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700; color:white;
-      background:var(--pink); box-shadow:0 2px 6px rgba(0,0,0,.12);
+      border:none; padding:10px 16px; border-radius:12px; cursor:pointer;
+      font-weight:800; font-size:1rem; letter-spacing:0.3px;
+      color:white; text-shadow:0 1px 2px rgba(0,0,0,.2);
+      background: linear-gradient(180deg, var(--btnGrad1), var(--btnGrad2));
+      box-shadow: 0 6px 14px rgba(255,114,162,.35);
+      transition: transform .04s ease, filter .2s ease, box-shadow .2s ease;
     }
-    button:active{ transform:translateY(1px); }
-    .tiny{ font-size:.85rem; opacity:.8; }
-    footer{ text-align:center; margin-top:16px; color:#92507a; }
+    button:hover{ filter:saturate(115%); box-shadow: 0 8px 18px rgba(255,114,162,.45) }
+    button:active{ transform: translateY(1px) }
+    .ghost{
+      background:transparent; color:var(--text);
+      border:2px solid var(--pink); font-weight:800;
+      text-shadow:none;
+    }
+    .ghost:hover{ background:var(--pink-50) }
+
+    footer{
+      text-align:center; padding:14px; color:var(--muted); font-size:.95rem; font-weight:500;
+      border-top:1px dashed var(--chipBorder);
+      background: radial-gradient(700px 120px at 50% 0%, var(--pink-50) 0%, transparent 60%);
+    }
+    kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      padding:.15em .4em; border:1px solid var(--chipBorder); border-bottom-width:2px; border-radius:6px;
+      background:var(--chip); font-size:.85em;
+    }
+    .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0 }
   </style>
 </head>
 <body>
-  <h1>🌸 Moji Muncher 🌸</h1>
-  <p class="sub tiny">Live word & character counts — pastel vibes included</p>
+  <main class="card" role="application" aria-label="Moji Muncher counter">
+    <header class="header">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">🌸</div>
+        <div>
+          <h1>Moji Muncher</h1>
+          <p class="sub">Live word & character counts </p>
+        </div>
+      </div>
+    </header>
 
-  <textarea id="textInput" placeholder="Type your cute message here..."></textarea>
+    <section class="editor">
+      <div class="textareaWrap" id="wrap">
+        <label for="textInput" class="sr-only">Text to analyze</label>
+        <textarea id="textInput" placeholder="Type your cute message here…" spellcheck="true"></textarea>
+        <div class="placeholder">Tip: paste with <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>V</kbd> — counts update instantly</div>
+      </div>
+    </section>
 
-  <div class="bar">
-    <div class="counter">
-      <div>Words: <span id="wordCount">0</span></div>
-      <div>Characters: <span id="charCount">0</span></div>
+    <div class="bar">
+      <div class="counter" aria-live="polite">
+        <div class="stat" title="Word count">Words: <b id="wordCount">0</b></div>
+        <div class="stat" title="Character count">Characters: <b id="charCount">0</b></div>
+        <div class="stat" title="Estimated reading time">Read time: <b id="readTime">0s</b></div>
+      </div>
+
+      <div class="btns" role="group" aria-label="Actions">
+        <button id="clearBtn" title="Clear the text (Ctrl/⌘+K)">Clear</button>
+        <button id="copyBtn" title="Copy text to clipboard (Ctrl/⌘+C)">Copy</button>
+        <button id="selectBtn" class="ghost" title="Select all (Ctrl/⌘+A)">Select</button>
+      </div>
     </div>
-    <div class="btns">
-      <button id="clearBtn" title="Clear the text">Clear</button>
-      <button id="copyBtn" title="Copy text to clipboard">Copy</button>
-    </div>
-  </div>
 
-  <footer class="tiny">Tip: paste text with Ctrl/⌘+V — counts update instantly</footer>
+    <footer>
+      Pro tip: Press <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd> to clear
+    </footer>
+  </main>
 
   <script>
     const el = {
       input: document.getElementById('textInput'),
       words: document.getElementById('wordCount'),
       chars: document.getElementById('charCount'),
+      read:  document.getElementById('readTime'),
       clear: document.getElementById('clearBtn'),
-      copy: document.getElementById('copyBtn')
+      copy:  document.getElementById('copyBtn'),
+      select:document.getElementById('selectBtn')
     };
 
-    // Robust word counting: prefer Intl.Segmenter if available (better for many languages)
     const segmenter = ('Intl' in window && Intl.Segmenter)
       ? new Intl.Segmenter(undefined, { granularity: 'word' })
       : null;
 
-    function countWords(text) {
-      const trimmed = text.trim();
-      if (!trimmed) return 0;
-      if (segmenter) {
-        let count = 0;
-        for (const s of segmenter.segment(trimmed)) {
-          if (s.isWordLike) count++;
-        }
-        return count;
+    function countWords(text){
+      const t = text.trim();
+      if(!t) return 0;
+      if(segmenter){
+        let c = 0; for(const s of segmenter.segment(t)) if(s.isWordLike) c++;
+        return c;
       }
-      // Fallback: split on whitespace
-      return trimmed.split(/\s+/).filter(Boolean).length;
+      return t.split(/\s+/).filter(Boolean).length;
     }
 
-    function update() {
+    function formatReadTime(words){
+      const wpm = 200;
+      const totalSec = Math.max(0, Math.round(words / wpm * 60));
+      if(totalSec < 60) return `${totalSec}s`;
+      const m = Math.floor(totalSec / 60);
+      const s = totalSec % 60;
+      return s ? `${m}m ${s}s` : `${m}m`;
+    }
+
+    function autosize(){
+      el.input.style.height = 'auto';
+      const max = Math.min(window.innerHeight * 0.6, 600);
+      el.input.style.height = Math.min(el.input.scrollHeight + 2, max) + 'px';
+    }
+
+    function update(){
       const text = el.input.value;
+      const w = countWords(text);
       el.chars.textContent = text.length;
-      el.words.textContent = countWords(text);
+      el.words.textContent = w;
+      el.read.textContent  = formatReadTime(w);
+      autosize();
     }
 
-    el.input.addEventListener('input', update);
-    el.clear.addEventListener('click', () => { el.input.value = ''; update(); el.input.focus(); });
+    el.clear.addEventListener('click', () => { el.input.value=''; update(); el.input.focus(); });
     el.copy.addEventListener('click', async () => {
-      try { await navigator.clipboard.writeText(el.input.value); el.copy.textContent = 'Copied!'; }
-      catch { el.copy.textContent = 'Copy failed'; }
-      setTimeout(() => el.copy.textContent = 'Copy', 1200);
+      try{ await navigator.clipboard.writeText(el.input.value); }
+      catch{ /* ignore */ }
+    });
+    el.select.addEventListener('click', () => { el.input.select(); });
+
+    window.addEventListener('keydown', (e) => {
+      const mod = e.ctrlKey || e.metaKey;
+      if(mod && e.key.toLowerCase()==='k'){ e.preventDefault(); el.clear.click(); }
+      if(mod && e.key.toLowerCase()==='c' && document.activeElement===el.input){ e.preventDefault(); el.copy.click(); }
     });
 
-    // Initialize on load
+    el.input.addEventListener('input', update);
+    window.addEventListener('resize', autosize);
     update();
   </script>
 </body>
 </html>
-
 
