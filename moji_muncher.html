@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🌸 Count Kawaii — Word & Character Counter</title>
+  <meta name="theme-color" content="#ffe6f0" />
+  <style>
+    :root{
+      --pink:#ff80aa; --pink-200:#ffb3d9; --pink-50:#fff0f5;
+      --bg1:#ffe6f0; --bg2:#e6f0ff; --text:#cc6699;
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family:'Comic Sans MS','Arial',sans-serif;
+      max-width:700px; margin:40px auto; padding:24px;
+      background:linear-gradient(135deg,var(--bg1),var(--bg2));
+      border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,.1);
+    }
+    h1{
+      text-align:center; color:var(--pink); font-size:2rem;
+      text-shadow:1px 1px #fff0f5; margin:0 0 12px;
+    }
+    .sub{ text-align:center; color:#a2557f; margin-bottom:16px; }
+    textarea{
+      width:100%; height:220px; padding:12px; font-size:16px; line-height:1.5;
+      border:2px solid var(--pink-200); border-radius:12px; background:#fffafc; resize:none; outline:none;
+    }
+    textarea:focus{ border-color:var(--pink); box-shadow:0 0 8px var(--pink-200); }
+    .bar{
+      margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+    }
+    .counter{
+      flex:1; min-width:220px; padding:10px; background:var(--pink-50); border:1px solid var(--pink-200);
+      border-radius:10px; display:flex; justify-content:space-around; font-weight:bold; color:var(--text);
+    }
+    .btns{ display:flex; gap:8px; }
+    button{
+      border:none; padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700; color:white;
+      background:var(--pink); box-shadow:0 2px 6px rgba(0,0,0,.12);
+    }
+    button:active{ transform:translateY(1px); }
+    .tiny{ font-size:.85rem; opacity:.8; }
+    footer{ text-align:center; margin-top:16px; color:#92507a; }
+  </style>
+</head>
+<body>
+  <h1>🌸 Count Kawaii 🌸</h1>
+  <p class="sub tiny">Live word & character counts — pastel vibes included</p>
+
+  <textarea id="textInput" placeholder="Type your cute message here..."></textarea>
+
+  <div class="bar">
+    <div class="counter">
+      <div>Words: <span id="wordCount">0</span></div>
+      <div>Characters: <span id="charCount">0</span></div>
+    </div>
+    <div class="btns">
+      <button id="clearBtn" title="Clear the text">Clear</button>
+      <button id="copyBtn" title="Copy text to clipboard">Copy</button>
+    </div>
+  </div>
+
+  <footer class="tiny">Tip: paste text with Ctrl/⌘+V — counts update instantly</footer>
+
+  <script>
+    const el = {
+      input: document.getElementById('textInput'),
+      words: document.getElementById('wordCount'),
+      chars: document.getElementById('charCount'),
+      clear: document.getElementById('clearBtn'),
+      copy: document.getElementById('copyBtn')
+    };
+
+    // Robust word counting: prefer Intl.Segmenter if available (better for many languages)
+    const segmenter = ('Intl' in window && Intl.Segmenter)
+      ? new Intl.Segmenter(undefined, { granularity: 'word' })
+      : null;
+
+    function countWords(text) {
+      const trimmed = text.trim();
+      if (!trimmed) return 0;
+      if (segmenter) {
+        let count = 0;
+        for (const s of segmenter.segment(trimmed)) {
+          if (s.isWordLike) count++;
+        }
+        return count;
+      }
+      // Fallback: split on whitespace
+      return trimmed.split(/\s+/).filter(Boolean).length;
+    }
+
+    function update() {
+      const text = el.input.value;
+      el.chars.textContent = text.length;
+      el.words.textContent = countWords(text);
+    }
+
+    el.input.addEventListener('input', update);
+    el.clear.addEventListener('click', () => { el.input.value = ''; update(); el.input.focus(); });
+    el.copy.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(el.input.value); el.copy.textContent = 'Copied!'; }
+      catch { el.copy.textContent = 'Copy failed'; }
+      setTimeout(() => el.copy.textContent = 'Copy', 1200);
+    });
+
+    // Initialize on load
+    update();
+  </script>
+</body>
+</html>
+
