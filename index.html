@@ -239,10 +239,19 @@
       if(mod && e.key.toLowerCase()==='c' && document.activeElement===el.input){ e.preventDefault(); el.copy.click(); }
     });
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BX9WJ1EVTZ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-BX9WJ1EVTZ');
+</script>
+
     el.input.addEventListener('input', update);
     window.addEventListener('resize', autosize);
     update();
   </script>
 </body>
 </html>
-
